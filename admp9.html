@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurukshetra Board Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-size: cover;
+            color: white;
+        }
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            display: inline-block;
+            box-shadow: 0px 0px 20px rgba(255, 215, 0, 0.5);
+            border-radius: 15px;
+        }
+        h1 {
+            color: gold;
+            text-shadow: 2px 2px 10px gold;
+        }
+        .dice {
+            font-size: 100px;
+            margin: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(6, 70px);
+            grid-gap: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 20px auto;
+            width: 450px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .cell {
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid gold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+        .player {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kurukshetra Board Game</h1>
+        <p>Select a player and roll the dice!</p>
+        <select id="playerSelect">
+            <option value="Arjuna" style="color: red;">Arjuna (Red)</option>
+            <option value="Duryodhana" style="color: blue;">Duryodhana (Blue)</option>
+            <option value="Bhishma" style="color: green;">Bhishma (Green)</option>
+            <option value="Krishna" style="color: yellow;">Krishna (Yellow)</option>
+        </select>
+        <br><br>
+        <div class="dice" id="dice">🎲</div>
+        <button onclick="rollDice()">Roll Dice</button>
+        <p id="result"></p>
+        <div class="board" id="board"></div>
+        <p id="chanceCard"></p>
+        <script>
+            let players = {
+                "Arjuna": "red",
+                "Duryodhana": "blue",
+                "Bhishma": "green",
+                "Krishna": "yellow"
+            };
+            let playerPositions = { "Arjuna": 0, "Duryodhana": 0, "Bhishma": 0, "Krishna": 0 };
+            let chanceCards = [
+                "Krishna’s advice allows you to skip a hurdle. Advance 3 spaces.",
+                "You made a wrong decision. Move back 2 spaces.",
+                "You helped an ally. Gain 1 virtue point.",
+                "A battle obstacle appears! Lose 1 turn.",
+                "You followed dharma. Move forward 2 spaces."
+            ];
+            
+            function createBoard() {
+                let board = document.getElementById("board");
+                board.innerHTML = "";
+                for (let i = 35; i >= 0; i--) {  // Reverse board
+                    let cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.id = `cell-${i}`;
+                    cell.textContent = i;
+                    board.appendChild(cell);
+                }
+            }
+            
+            function rollDice() {
+                let diceRoll = Math.floor(Math.random() * 6) + 1;
+                document.getElementById("dice").textContent = diceRoll;
+                let selectedPlayer = document.getElementById("playerSelect").value;
+                movePlayer(selectedPlayer, diceRoll);
+                triggerChanceCard();
+            }
+            
+            function movePlayer(player, steps) {
+                let newPosition = playerPositions[player] + steps;
+                if (newPosition > 35) newPosition = 35;
+                playerPositions[player] = newPosition;
+                updateBoard();
+            }
+            
+            function updateBoard() {
+                document.querySelectorAll(".player").forEach(el => el.remove());
+                for (let player in playerPositions) {
+                    let position = playerPositions[player];
+                    let cell = document.getElementById(`cell-${position}`);
+                    let playerPiece = document.createElement("div");
+                    playerPiece.classList.add("player");
+                    playerPiece.style.backgroundColor = players[player];
+                    cell.appendChild(playerPiece);
+                }
+            }
+            
+            function triggerChanceCard() {
+                let card = chanceCards[Math.floor(Math.random() * chanceCards.length)];
+                document.getElementById("chanceCard").textContent = `Chance Card: ${card}`;
+            }
+            
+            createBoard();
+            updateBoard();
+        </script>
+    </div>
+</body>
+</html>
